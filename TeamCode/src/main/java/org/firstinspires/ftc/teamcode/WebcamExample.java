@@ -38,12 +38,13 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name="Vision Rover", group="Linear Opmode")
+@TeleOp(name="Vision Rover", group="Linear Opmode")
 public class WebcamExample extends LinearOpMode
 {
     OpenCvCamera webcam;
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFront, leftBack, rightFront, rightBack;
+   // Define basic driving code
     private void drive( double x, double y ){
         double lf, rf, lr, rr;
         lf = y + x;
@@ -61,6 +62,7 @@ public class WebcamExample extends LinearOpMode
     public void runOpMode()
     {
         GripPipeline grip = new GripPipeline();
+        // Declare all driving motors
         leftFront = hardwareMap.get( DcMotor.class, "leftFront" );
         rightFront = hardwareMap.get( DcMotor.class, "rightFront" );
         leftBack = hardwareMap.get( DcMotor.class, "leftBack" );
@@ -126,14 +128,22 @@ public class WebcamExample extends LinearOpMode
         while (opModeIsActive())
         {
             double fiveP = 320 * 0.05;
-            if( grip.getCenterX() > (320/2) + fiveP || grip.getCenterX() < (320/2) - fiveP ){
-                drive(-1 * grip.getCenterX() / (320/2) * Math.signum( grip.getCenterX() - ( 320/2 ) ),0);
-            } else {
-                drive(0,0 );
+            // Only start moving if target is found
+            if( grip.haveTarget() ){
+                // Do movement unless within 5% of target being center
+                // Proportional to distance from center. Debating using PID
+                if( grip.getCenterX() > (320/2) + fiveP || grip.getCenterX() < (320/2) - fiveP ){
+                    drive(-1 * grip.getCenterX() / ( 320 / 2 ) * Math.signum( grip.getCenterX() - ( 320/2 ) ),0);
+                } else {
+                    drive(0,0 );
+                }
+            }else{
+                drive( 0, 0 );
             }
             /*
              * Send some stats to the telemetry
              */
+            // Debug
             telemetry.addData("Frame Count", webcam.getFrameCount());
             telemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
             telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
@@ -141,6 +151,7 @@ public class WebcamExample extends LinearOpMode
             telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
             telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
             telemetry.addData("Target X", grip.getCenterX());
+            telemetry.addData("Target?", grip.haveTarget());
             telemetry.update();
 
 

@@ -75,11 +75,16 @@ public class GripPipeline implements OpenCvPipeline{
 							r.x + r.width,
 							r.y + r.height),
 					new Scalar(0, 255, 0), 4);
+		}else{
+			targetCenter=0;
 		}
 		return source0;
 	}
 	public double getCenterX(){
 		return targetCenter;
+	}
+	public boolean haveTarget(){
+		return !findContoursOutput.isEmpty();
 	}
 	/**
 	 * This method is a generated getter for the output of a RGB_Threshold.

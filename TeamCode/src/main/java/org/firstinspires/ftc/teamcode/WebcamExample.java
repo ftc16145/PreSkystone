@@ -21,8 +21,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.GripPipeline;
@@ -35,14 +38,38 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@TeleOp
+@Autonomous(name="Vision Rover", group="Linear Opmode")
 public class WebcamExample extends LinearOpMode
 {
     OpenCvCamera webcam;
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor leftFront, leftBack, rightFront, rightBack;
+    private void drive( double x, double y ){
+        double lf, rf, lr, rr;
+        lf = y + x;
+        lr = lf;
+        rf = y - x;
+        rr = rf;
+        leftFront.setPower(lf);
+        rightFront.setPower(rf);
+        leftBack.setPower(lr);
+        rightBack.setPower(rr);
+    }
+
 
     @Override
     public void runOpMode()
     {
+        GripPipeline grip = new GripPipeline();
+        leftFront = hardwareMap.get( DcMotor.class, "leftFront" );
+        rightFront = hardwareMap.get( DcMotor.class, "rightFront" );
+        leftBack = hardwareMap.get( DcMotor.class, "leftBack" );
+        rightBack = hardwareMap.get( DcMotor.class, "rightBack" );
+
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        leftBack.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        rightBack.setDirection(DcMotor.Direction.REVERSE);
         /*
          * Instantiate an OpenCvCamera object for the camera we'll be using.
          * In this sample, we're using a webcam. Note that you will need to
@@ -69,7 +96,7 @@ public class WebcamExample extends LinearOpMode
          * of a frame from the camera. Note that switching pipelines on-the-fly
          * (while a streaming session is in flight) *IS* supported.
          */
-        webcam.setPipeline(new GripPipeline());
+        webcam.setPipeline(grip);
 
         /*
          * Wait for the user to press start on the Driver Station
@@ -98,6 +125,12 @@ public class WebcamExample extends LinearOpMode
 
         while (opModeIsActive())
         {
+            double fiveP = 320 * 0.05;
+            if( grip.getCenterX() > (320/2) + fiveP || grip.getCenterX() < (320/2) - fiveP ){
+                drive(-1 * grip.getCenterX() / (320/2) * Math.signum( grip.getCenterX() - ( 320/2 ) ),0);
+            } else {
+                drive(0,0 );
+            }
             /*
              * Send some stats to the telemetry
              */
@@ -107,7 +140,9 @@ public class WebcamExample extends LinearOpMode
             telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
             telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
             telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
+            telemetry.addData("Target X", grip.getCenterX());
             telemetry.update();
+
 
             /*
              * NOTE: stopping the stream from the camera early (before the end of the OpMode
@@ -167,6 +202,7 @@ public class WebcamExample extends LinearOpMode
              */
             sleep(100);
         }
+
     }
 
     /*

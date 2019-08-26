@@ -42,6 +42,8 @@ public class GripPipeline implements OpenCvPipeline{
 	public Mat processFrame(Mat source0) {
 		// Step RGB_Threshold0:
 		Mat rgbThresholdInput = source0;
+		// 100 84 134
+		// 218 51 140
 		double[] rgbThresholdRed = {107.77877697841726, 255.0};
 		double[] rgbThresholdGreen = {112.36510791366906, 255.0};
 		double[] rgbThresholdBlue = {0.0, 80.93856655290104};
@@ -125,17 +127,17 @@ public class GripPipeline implements OpenCvPipeline{
 	 */
 	private void findContours(Mat input, boolean externalOnly,
 		List<MatOfPoint> contours) {
-		Mat hierarchy = new Mat();
-		contours.clear();
-		int mode;
-		if (externalOnly) {
-			mode = Imgproc.RETR_EXTERNAL;
-		}
-		else {
-			mode = Imgproc.RETR_LIST;
-		}
-		int method = Imgproc.CHAIN_APPROX_SIMPLE;
-		Imgproc.findContours(input, contours, hierarchy, mode, method);
+			Mat hierarchy = new Mat();
+			contours.clear();
+			int mode;
+			if (externalOnly) {
+				mode = Imgproc.RETR_EXTERNAL;
+			}
+			else {
+				mode = Imgproc.RETR_LIST;
+			}
+			int method = Imgproc.CHAIN_APPROX_SIMPLE;
+			Imgproc.findContours(input, contours, hierarchy, mode, method);
 	}
 
 

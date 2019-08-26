@@ -13,7 +13,6 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
-
 dependencies {
-    implementation 'org.openftc:easyopencv:1.0'
+    implementation 'org.openftc:easyopencv:1.1'
 }

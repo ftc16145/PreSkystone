@@ -34,9 +34,7 @@ public class GripPipeline implements OpenCvPipeline{
 	private double targetCenter;
 	private double maxSize = -1;
 	private int closest = -1;
-	static {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-	}
+
 
 	/**
 	 * This is the primary method that runs the entire pipeline and updates the outputs.

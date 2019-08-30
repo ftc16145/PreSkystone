@@ -26,7 +26,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 *
 * @author GRIP
 */
-public class GripPipeline implements OpenCvPipeline{
+public class GripPipeline extends OpenCvPipeline{
 
 	//Outputs
 	private Mat rgbThresholdOutput = new Mat();
